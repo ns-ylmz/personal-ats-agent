@@ -1,0 +1,25 @@
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
+
+# Agent Configurations
+# Per-user local overrides and personal instructions
+.agents/hooks.local.json
+GEMINI.local.md
+MEMORY.local.md
+AGENTS.local.md
+
+# Claude Code
+.claude/settings.local.json
+CLAUDE.local.md

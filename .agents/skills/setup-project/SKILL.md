@@ -1,0 +1,1 @@
+../../../.ai/skills/setup-project/SKILL.md

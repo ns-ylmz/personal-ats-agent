@@ -1,0 +1,28 @@
+{
+  "guard-git-and-pr": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "../.ai/hooks/guard-git.sh"
+          },
+          {
+            "type": "command",
+            "command": "../.ai/hooks/guard-pr-body.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__.*__pull_request_create",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "../.ai/hooks/guard-pr-body.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
