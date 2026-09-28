@@ -108,8 +108,19 @@ docs/ai-workflow-guidance
 Use Conventional Commit messages in this format:
 
 ```txt
-<type>(optional-scope): <imperative lowercase description>
+<type>(scope): <imperative lowercase description>
 ```
+
+**Allowed Scopes:**
+- `api` (FastAPI endpoints, routers)
+- `db` (Database, SQLAlchemy models, schemas)
+- `worker` (Background jobs, threading, queues)
+- `llm` (Gemini, Ollama integrations, strategy)
+- `rag` (In-context learning, vector logic)
+- `scraper` (Playwright, web scraping)
+- `frontend` (Next.js UI, dashboard components)
+- `core` (Shared utilities, config, base classes)
+- `docs` (Documentation, AI guidelines, planning)
 
 Repository-approved commit types are:
 
@@ -177,7 +188,8 @@ When Git workflow completion is explicitly requested:
 7. Report the branch name, commit SHA, and pull request URL.
 8. Do not merge the pull request unless explicitly requested.
 9. Confirm the working tree is clean, switch the local working directory to `main`, and update it with `git pull --ff-only origin main`.
-10. Keep the open task branch available locally and remotely until the pull request is merged or explicitly closed.
+10. Move the executed task markdown file from `planning/active/` to `planning/archive/` using `git mv` and include it in your final commit for the PR.
+11. Keep the open task branch available locally and remotely until the pull request is merged or explicitly closed.
 
 ---
 
