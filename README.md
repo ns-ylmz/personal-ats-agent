@@ -31,3 +31,17 @@ This repository utilizes a strict Agentic Workflow to maintain architectural coh
 - `.ai/`: The canonical knowledge base for AI behavior (guidelines, prompt templates, guardrail hooks, and skills).
 - `backend/`: *(To be created)* The Python FastAPI application and worker.
 - `frontend/`: *(To be created)* The Next.js web application.
+
+## Getting Started
+
+### Frontend
+
+To start the Next.js development server:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the frontend application.
