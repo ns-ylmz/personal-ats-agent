@@ -23,3 +23,8 @@ AGENTS.local.md
 # Claude Code
 .claude/settings.local.json
 CLAUDE.local.md
+
+# Python
+venv/
+__pycache__/
+*.db
