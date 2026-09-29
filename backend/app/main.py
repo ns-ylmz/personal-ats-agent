@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.database import engine
 from app import models
 from app.worker import start_worker, job_queue
+from app.api import jobs
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
@@ -18,11 +19,9 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Personal ATS Agent API", lifespan=lifespan)
 
+app.include_router(jobs.router)
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
 
-@app.post("/test-job")
-def add_test_job(job_name: str):
-    job_queue.put(job_name)
-    return {"message": f"Job '{job_name}' added to queue."}
