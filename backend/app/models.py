@@ -14,3 +14,11 @@ class Job(Base):
     match_score = Column(Integer, nullable=True)
     cover_letter = Column(Text, nullable=True)
     prep_questions = Column(Text, nullable=True)  # Stored as JSON string
+
+class UserProfile(Base):
+    __tablename__ = "user_profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    skills = Column(Text, nullable=False)  # Stored as JSON string
+    experience_summary = Column(Text, nullable=False)
+
