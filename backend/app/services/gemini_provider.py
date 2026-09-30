@@ -1,5 +1,5 @@
 import os
-from .llm_provider import LLMProvider, JobAnalysisResult
+from .llm_provider import LLMProvider, JobAnalysisResult, MasterProfile
 from google import genai
 from google.genai import types
 
@@ -35,3 +35,25 @@ Job Description:
             raise ValueError("Empty response from Gemini API.")
             
         return JobAnalysisResult.model_validate_json(response.text)
+
+    def extract_master_profile(self, cv_text: str) -> MasterProfile:
+        prompt = f"""
+Extract the core professional profile from the following CV.
+
+CV:
+{cv_text}
+"""
+        response = self.client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=MasterProfile,
+                temperature=0.1,
+            ),
+        )
+        
+        if not response.text:
+            raise ValueError("Empty response from Gemini API.")
+            
+        return MasterProfile.model_validate_json(response.text)
