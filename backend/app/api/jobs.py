@@ -45,3 +45,44 @@ async def get_job_status(job_id: int, db: Session = Depends(get_db)):
         cover_letter=job.cover_letter,
         prep_questions=prep_questions_list
     )
+
+@router.patch("/{job_id}/status", response_model=schemas.JobStatusResponse)
+async def update_job_status(job_id: int, request: schemas.JobStatusUpdate, db: Session = Depends(get_db)):
+    job = db.query(models.Job).filter(models.Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+        
+    job.status = request.status
+    db.commit()
+    db.refresh(job)
+    
+    prep_questions_list = None
+    if job.prep_questions:
+        try:
+            prep_questions_list = json.loads(job.prep_questions)
+        except:
+            prep_questions_list = []
+            
+    return schemas.JobStatusResponse(
+        id=job.id,
+        status=job.status,
+        match_score=job.match_score,
+        cover_letter=job.cover_letter,
+        prep_questions=prep_questions_list
+    )
+
+@router.post("/{job_id}/feedback", response_model=schemas.InterviewFeedbackResponse, status_code=status.HTTP_201_CREATED)
+async def add_interview_feedback(job_id: int, request: schemas.InterviewFeedbackCreate, db: Session = Depends(get_db)):
+    job = db.query(models.Job).filter(models.Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+        
+    feedback = models.InterviewFeedback(
+        job_id=job_id,
+        feedback_text=request.feedback_text
+    )
+    db.add(feedback)
+    db.commit()
+    db.refresh(feedback)
+    
+    return feedback
