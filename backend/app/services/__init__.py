@@ -8,6 +8,7 @@ def get_llm_provider() -> LLMProvider:
         from .gemini_provider import GeminiProvider
         return GeminiProvider()
     elif provider == "OLLAMA":
-        raise NotImplementedError("OllamaProvider is not yet implemented.")
+        from .ollama_provider import OllamaProvider
+        return OllamaProvider()
     else:
         raise ValueError(f"Unknown LLM_PROVIDER: {provider}")
