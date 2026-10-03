@@ -13,7 +13,7 @@ class MasterProfile(BaseModel):
 
 class LLMProvider(ABC):
     @abstractmethod
-    def analyze_job(self, cv_text: str, job_description: str) -> JobAnalysisResult:
+    def analyze_job(self, cv_text: str, job_description: str, past_feedback: str = "") -> JobAnalysisResult:
         """Analyzes a job description against a CV and returns structured results."""
         pass
     

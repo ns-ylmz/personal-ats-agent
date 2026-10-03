@@ -10,9 +10,19 @@ class GeminiProvider(LLMProvider):
             raise ValueError("GEMINI_API_KEY is not set.")
         self.client = genai.Client(api_key=self.api_key)
 
-    def analyze_job(self, cv_text: str, job_description: str) -> JobAnalysisResult:
+    def analyze_job(self, cv_text: str, job_description: str, past_feedback: str = "") -> JobAnalysisResult:
+        feedback_section = ""
+        if past_feedback:
+            feedback_section = f"""
+Past Interview Feedback Context:
+Focus on addressing these past interview weaknesses and areas of improvement when generating prep questions.
+{past_feedback}
+"""
+
         prompt = f"""
 Analyze the following CV against the given job description.
+
+{feedback_section}
 
 CV:
 {cv_text}
