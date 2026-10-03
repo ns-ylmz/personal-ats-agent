@@ -33,9 +33,16 @@ def worker_loop():
                     feedbacks = db.query(models.InterviewFeedback).all()
                     past_feedback_text = "\n".join([f"- {f.feedback_text}" for f in feedbacks])
                     
+                    # Resolve job description (scrape if URL)
+                    job_desc_text = job.job_description
+                    if job_desc_text.startswith("http://") or job_desc_text.startswith("https://"):
+                        from app.services.scraper import scrape_job_description
+                        logger.info(f"Job description is a URL. Scraping: {job_desc_text}")
+                        job_desc_text = scrape_job_description(job_desc_text)
+                    
                     # Process with LLM
                     provider = get_llm_provider()
-                    result = provider.analyze_job(job.cv_text, job.job_description, past_feedback=past_feedback_text)
+                    result = provider.analyze_job(job.cv_text, job_desc_text, past_feedback=past_feedback_text)
                     
                     # Update job
                     job.match_score = result.match_score
