@@ -29,9 +29,13 @@ def worker_loop():
             try:
                 job = db.query(models.Job).filter(models.Job.id == job_id).first()
                 if job:
+                    # Fetch all past interview feedback to inject as minimal RAG
+                    feedbacks = db.query(models.InterviewFeedback).all()
+                    past_feedback_text = "\n".join([f"- {f.feedback_text}" for f in feedbacks])
+                    
                     # Process with LLM
                     provider = get_llm_provider()
-                    result = provider.analyze_job(job.cv_text, job.job_description)
+                    result = provider.analyze_job(job.cv_text, job.job_description, past_feedback=past_feedback_text)
                     
                     # Update job
                     job.match_score = result.match_score
