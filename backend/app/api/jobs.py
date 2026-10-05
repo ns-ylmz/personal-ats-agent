@@ -24,6 +24,26 @@ async def analyze_job(request: schemas.JobAnalyzeRequest, db: Session = Depends(
     
     return {"message": "Job enqueued", "job_id": new_job.id}
 
+@router.get("", response_model=list[schemas.JobStatusResponse])
+async def get_all_jobs(db: Session = Depends(get_db)):
+    jobs = db.query(models.Job).order_by(models.Job.id.desc()).all()
+    results = []
+    for job in jobs:
+        prep_questions_list = None
+        if job.prep_questions:
+            try:
+                prep_questions_list = json.loads(job.prep_questions)
+            except:
+                prep_questions_list = []
+        results.append(schemas.JobStatusResponse(
+            id=job.id,
+            status=job.status,
+            match_score=job.match_score,
+            cover_letter=job.cover_letter,
+            prep_questions=prep_questions_list
+        ))
+    return results
+
 @router.get("/{job_id}", response_model=schemas.JobStatusResponse)
 async def get_job_status(job_id: int, db: Session = Depends(get_db)):
     job = db.query(models.Job).filter(models.Job.id == job_id).first()
