@@ -39,6 +39,7 @@ def worker_loop():
                         from app.services.scraper import scrape_job_description
                         logger.info(f"Job description is a URL. Scraping: {job_desc_text}")
                         job_desc_text = scrape_job_description(job_desc_text)
+                        job.job_description = job_desc_text # Persist the scraped text to DB
                     
                     # Process with LLM
                     provider = get_llm_provider()
