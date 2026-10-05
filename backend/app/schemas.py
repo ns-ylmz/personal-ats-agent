@@ -8,6 +8,7 @@ class JobAnalyzeRequest(BaseModel):
 class JobStatusResponse(BaseModel):
     id: int
     status: str
+    job_description: Optional[str] = None
     match_score: Optional[int] = None
     cover_letter: Optional[str] = None
     prep_questions: Optional[List[str]] = None

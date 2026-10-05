@@ -38,6 +38,7 @@ async def get_all_jobs(db: Session = Depends(get_db)):
         results.append(schemas.JobStatusResponse(
             id=job.id,
             status=job.status,
+            job_description=job.job_description,
             match_score=job.match_score,
             cover_letter=job.cover_letter,
             prep_questions=prep_questions_list
@@ -61,6 +62,7 @@ async def get_job_status(job_id: int, db: Session = Depends(get_db)):
     return schemas.JobStatusResponse(
         id=job.id,
         status=job.status,
+        job_description=job.job_description,
         match_score=job.match_score,
         cover_letter=job.cover_letter,
         prep_questions=prep_questions_list
@@ -86,6 +88,7 @@ async def update_job_status(job_id: int, request: schemas.JobStatusUpdate, db: S
     return schemas.JobStatusResponse(
         id=job.id,
         status=job.status,
+        job_description=job.job_description,
         match_score=job.match_score,
         cover_letter=job.cover_letter,
         prep_questions=prep_questions_list

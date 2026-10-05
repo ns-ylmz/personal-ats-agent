@@ -122,7 +122,8 @@ export default function Dashboard() {
                   {jobs
                     .filter(j => col.statuses.includes(j.status))
                     .map(job => (
-                      <Card key={job.id} className="shadow-sm cursor-pointer hover:shadow-md transition-shadow border-gray-200">
+                      <div key={job.id} onClick={() => window.location.href = `/jobs/${job.id}`}>
+                      <Card className="shadow-sm cursor-pointer hover:shadow-md transition-shadow border-gray-200">
                         <CardHeader className="p-4 pb-2">
                           <CardTitle className="text-base text-gray-800">Job #{job.id}</CardTitle>
                         </CardHeader>
@@ -144,6 +145,7 @@ export default function Dashboard() {
                           </div>
                         </CardContent>
                       </Card>
+                      </div>
                     ))}
                     
                   {jobs.filter(j => col.statuses.includes(j.status)).length === 0 && (
