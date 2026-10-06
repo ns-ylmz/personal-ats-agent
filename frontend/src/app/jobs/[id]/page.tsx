@@ -23,6 +23,7 @@ export default function JobDetailPage() {
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState("");
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [isDescExpanded, setIsDescExpanded] = useState(false);
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -137,9 +138,18 @@ export default function JobDetailPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="whitespace-pre-wrap text-sm text-gray-700 bg-gray-100/50 p-4 rounded-lg overflow-y-auto max-h-[600px]">
+                <div className={`whitespace-pre-wrap text-sm text-gray-700 bg-gray-100/50 p-4 rounded-lg overflow-y-auto ${isDescExpanded ? 'max-h-full' : 'max-h-[300px]'}`}>
                   {job.job_description || "No description available."}
                 </div>
+                {job.job_description && job.job_description.length > 500 && (
+                  <Button 
+                    variant="ghost" 
+                    className="w-full mt-2 text-blue-600 text-xs" 
+                    onClick={() => setIsDescExpanded(!isDescExpanded)}
+                  >
+                    {isDescExpanded ? "Show Less" : "Read Full Description"}
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>
