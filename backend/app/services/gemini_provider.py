@@ -1,10 +1,11 @@
 import os
+from typing import Optional
 from .llm_provider import LLMProvider, JobAnalysisResult, MasterProfile
 from google import genai
 from google.genai import types
 
 class GeminiProvider(LLMProvider):
-    def __init__(self, api_key: str | None = None):
+    def __init__(self, api_key: Optional[str] = None):
         self.api_key = api_key or os.getenv("GEMINI_API_KEY")
         if not self.api_key:
             raise ValueError("GEMINI_API_KEY is not set.")
