@@ -7,3 +7,4 @@ PyPDF2
 python-multipart
 playwright
 ollama
+python-dotenv==1.2.1
