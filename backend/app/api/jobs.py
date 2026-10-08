@@ -109,3 +109,13 @@ async def add_interview_feedback(job_id: int, request: schemas.InterviewFeedback
     db.refresh(feedback)
     
     return feedback
+
+@router.delete("/{job_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_job(job_id: int, db: Session = Depends(get_db)):
+    job = db.query(models.Job).filter(models.Job.id == job_id).first()
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+        
+    db.delete(job)
+    db.commit()
+    return None

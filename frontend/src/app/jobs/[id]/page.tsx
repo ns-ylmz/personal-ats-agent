@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Loader2, Sparkles, Target, MessageSquare, Send } from "lucide-react";
+import { ArrowLeft, Loader2, Sparkles, Target, MessageSquare, Send, Trash2 } from "lucide-react";
 
 type JobDetail = {
   id: number;
@@ -79,6 +79,20 @@ export default function JobDetailPage() {
     }
   };
 
+  const handleDeleteJob = async () => {
+    if (!window.confirm("Are you sure you want to delete this job?")) return;
+    try {
+      const res = await fetch(`http://localhost:8000/jobs/${id}`, {
+        method: "DELETE"
+      });
+      if (res.ok) {
+        router.push("/");
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -101,28 +115,34 @@ export default function JobDetailPage() {
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="icon" onClick={() => router.push("/")}>
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Application #{job.id}</h1>
-            <div className="flex items-center gap-3 mt-1">
-              <span className="text-sm font-medium text-gray-500">Status:</span>
-              <select 
-                className="text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
-                value={job.status}
-                onChange={(e) => handleUpdateStatus(e.target.value)}
-              >
-                <option value="PENDING">Pending</option>
-                <option value="COMPLETED">Analyzed</option>
-                <option value="APPLIED">Applied</option>
-                <option value="INTERVIEWING">Interviewing</option>
-                <option value="OFFER">Offer</option>
-                <option value="REJECTED">Rejected</option>
-              </select>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="outline" size="icon" onClick={() => router.push("/")}>
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Application #{job.id}</h1>
+              <div className="flex items-center gap-3 mt-1">
+                <span className="text-sm font-medium text-gray-500">Status:</span>
+                <select 
+                  className="text-sm border-gray-300 rounded-md shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                  value={job.status}
+                  onChange={(e) => handleUpdateStatus(e.target.value)}
+                >
+                  <option value="PENDING">Pending</option>
+                  <option value="COMPLETED">Analyzed</option>
+                  <option value="APPLIED">Applied</option>
+                  <option value="INTERVIEWING">Interviewing</option>
+                  <option value="OFFER">Offer</option>
+                  <option value="REJECTED">Rejected</option>
+                </select>
+              </div>
             </div>
           </div>
+          <Button variant="destructive" size="sm" onClick={handleDeleteJob} className="flex items-center gap-2">
+            <Trash2 className="w-4 h-4" />
+            Delete
+          </Button>
         </div>
 
         {/* Content Grid */}

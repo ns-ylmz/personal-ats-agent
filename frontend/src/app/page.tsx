@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Briefcase, Loader2, Plus } from "lucide-react";
+import { Briefcase, Loader2, Plus, Trash2 } from "lucide-react";
 
 type Job = {
   id: number;
@@ -71,6 +71,20 @@ export default function Dashboard() {
     }
   };
 
+  const handleDelete = async (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    try {
+      const res = await fetch(`http://localhost:8000/jobs/${id}`, {
+        method: "DELETE"
+      });
+      if (res.ok) {
+        fetchJobs(); // Refresh board
+      }
+    } catch (err) {
+      console.error("Failed to delete job", err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -124,8 +138,16 @@ export default function Dashboard() {
                     .map(job => (
                       <div key={job.id} onClick={() => window.location.href = `/jobs/${job.id}`}>
                       <Card className="shadow-sm cursor-pointer hover:shadow-md transition-shadow border-gray-200">
-                        <CardHeader className="p-4 pb-2">
+                        <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between">
                           <CardTitle className="text-base text-gray-800">Job #{job.id}</CardTitle>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-6 w-6 text-gray-400 hover:text-red-600 hover:bg-red-50 -mt-1 -mr-1"
+                            onClick={(e) => handleDelete(e, job.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </CardHeader>
                         <CardContent className="p-4 pt-0">
                           <div className="flex items-center justify-between mt-2">
