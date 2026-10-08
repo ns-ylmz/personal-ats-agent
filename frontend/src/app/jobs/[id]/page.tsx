@@ -25,21 +25,37 @@ export default function JobDetailPage() {
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
 
-  useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        const res = await fetch(`http://localhost:8000/jobs/${id}`);
-        if (res.ok) {
-          const data = await res.json();
-          setJob(data);
-        }
-      } catch (e) {
-        console.error("Failed to fetch job", e);
-      } finally {
-        setLoading(false);
+  const fetchJob = async () => {
+    try {
+      const res = await fetch(`http://localhost:8000/jobs/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setJob(data);
       }
-    };
-    if (id) fetchJob();
+    } catch (e) {
+      console.error("Failed to fetch job", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchJob();
+      
+      const eventSource = new EventSource("http://localhost:8000/jobs/events");
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          // If the event is for this specific job, refresh the data
+          if (data.job_id === Number(id)) {
+            fetchJob();
+          }
+        } catch (err) {}
+      };
+      
+      return () => eventSource.close();
+    }
   }, [id]);
 
   const handleAddFeedback = async (e: React.FormEvent) => {

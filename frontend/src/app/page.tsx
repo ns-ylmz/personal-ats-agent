@@ -44,6 +44,22 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchJobs();
+
+    const eventSource = new EventSource("http://localhost:8000/jobs/events");
+    eventSource.onmessage = (event) => {
+      console.log("SSE Event:", event.data);
+      // Just re-fetch all jobs when any event comes in to keep it simple and robust
+      fetchJobs();
+    };
+    eventSource.onerror = (err) => {
+      console.error("SSE Error:", err);
+      eventSource.close();
+      // Optionally reconnect logic could go here, but browser handles basic reconnects
+    };
+
+    return () => {
+      eventSource.close();
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -58,6 +58,9 @@ def worker_loop():
                     job.status = "COMPLETED"
                     db.commit()
                     logger.info(f"Job {job_id} processed successfully.")
+                    
+                    from app.events import job_events
+                    job_events.broadcast({"job_id": job_id, "status": "COMPLETED"})
                 else:
                     logger.error(f"Job {job_id} not found in database.")
             except Exception as inner_e:
@@ -65,6 +68,9 @@ def worker_loop():
                 if 'job' in locals() and job:
                     job.status = "FAILED"
                     db.commit()
+                    
+                    from app.events import job_events
+                    job_events.broadcast({"job_id": job_id, "status": "FAILED"})
             finally:
                 db.close()
             
