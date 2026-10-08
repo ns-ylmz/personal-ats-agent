@@ -16,8 +16,6 @@ Focus on addressing these past interview weaknesses and areas of improvement whe
 {past_feedback}
 """
 
-        schema = JobAnalysisResult.schema_json()
-
         prompt = f"""
 You are an expert ATS (Applicant Tracking System) and career coach.
 Analyze the following CV against the given job description.
@@ -30,13 +28,12 @@ CV:
 Job Description:
 {job_description}
 
-You must respond in strictly valid JSON format matching this schema:
-{schema}
+Please provide the match score, a cover letter, and prep questions.
 """
         response = ollama.generate(
             model=self.model,
             prompt=prompt,
-            format='json'
+            format=JobAnalysisResult.model_json_schema()
         )
         
         if not response or 'response' not in response:
@@ -45,21 +42,18 @@ You must respond in strictly valid JSON format matching this schema:
         return JobAnalysisResult.model_validate_json(response['response'])
 
     def extract_master_profile(self, cv_text: str) -> MasterProfile:
-        schema = MasterProfile.schema_json()
-        
         prompt = f"""
 Extract the core professional profile from the following CV.
 
 CV:
 {cv_text}
 
-You must respond in strictly valid JSON format matching this schema:
-{schema}
+Please provide the skills and experience summary.
 """
         response = ollama.generate(
             model=self.model,
             prompt=prompt,
-            format='json'
+            format=MasterProfile.model_json_schema()
         )
         
         if not response or 'response' not in response:
