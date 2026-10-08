@@ -1,12 +1,34 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 import json
+import asyncio
 
 from app import models, schemas
 from app.database import get_db
 from app.worker import job_queue
+from app.events import job_events
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
+
+@router.get("/events")
+async def sse_jobs_events():
+    """SSE Endpoint for real-time job status updates."""
+    loop = asyncio.get_running_loop()
+    q = asyncio.Queue()
+    job_events.subscribe(loop, q)
+
+    async def event_generator():
+        try:
+            while True:
+                message = await q.get()
+                yield f"data: {json.dumps(message)}\n\n"
+        except asyncio.CancelledError:
+            pass
+        finally:
+            job_events.unsubscribe(loop, q)
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 @router.post("/analyze", status_code=status.HTTP_202_ACCEPTED)
 async def analyze_job(request: schemas.JobAnalyzeRequest, db: Session = Depends(get_db)):
