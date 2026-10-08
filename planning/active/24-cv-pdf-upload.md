@@ -1,50 +1,47 @@
-# Task: Profile Management & PDF CV Upload
+# Task: Wire Profile Management & PDF CV Upload Frontend
 
 ## Objective
 
-Allow the user to upload their CV in PDF format, extract its raw text, use the LLM to generate a `MasterProfile` (skills and experience summary), and use this real CV data for all future job analyses instead of hardcoded text.
+Leverage the existing backend profile endpoints (`api/profile.py`) to allow the user to upload their CV in PDF format via a new frontend UI, and wire `worker.py` to use the extracted CV context for all future job analyses instead of a hardcoded payload.
 
 ## Required Context
 
 - .ai/guidelines/workflow.md
 - backend/app/models.py
-- backend/app/api/jobs.py
+- backend/app/api/profile.py
+- backend/app/worker.py
 - frontend/src/app/page.tsx
 
 ## Affected Areas
 
-- `backend/app/models.py` (Create `UserProfile` table to store `raw_cv_text`, `skills`, and `experience_summary`)
-- `backend/app/api/profile.py` (New router for `POST /profile/upload` and `GET /profile`)
-- `backend/app/main.py` (Include the new profile router)
-- `backend/requirements.txt` (Add a PDF parsing library like `PyPDF2` or `pdfplumber` and `python-multipart` for file uploads)
-- `backend/app/worker.py` (Query `UserProfile` to fetch the real `cv_text` for LLM analysis instead of trusting the frontend payload)
-- `frontend/src/app/page.tsx` (Remove hardcoded `cv_text` from the analyze payload. Add a minimal "Upload CV" button or redirect to a profile page)
-- `frontend/src/app/profile/page.tsx` (New page: Upload PDF, display extracted skills/experience)
+- `backend/app/models.py` (Add `raw_cv_text` column to existing `UserProfile` table)
+- `backend/app/api/profile.py` (Save the extracted raw text into the new `raw_cv_text` column)
+- `backend/app/worker.py` (Query `UserProfile.raw_cv_text` to fetch the real CV context for LLM analysis, ignoring the frontend payload)
+- `backend/app/schemas.py` (Make `cv_text` optional in `JobAnalyzeRequest`)
+- `frontend/src/app/page.tsx` (Remove hardcoded `cv_text` from the analyze payload. Add a "My Profile" button in the header)
+- `frontend/src/app/profile/page.tsx` (New page: UI to upload PDF and display the extracted `skills` and `experience_summary`)
 
 ## Constraints
 
-- Only `.pdf` files need to be supported initially.
-- The `UserProfile` should act as a singleton (e.g., just updating the row with `id=1` or taking the latest created row) to keep things simple for a personal ATS.
-- The extraction of `MasterProfile` from the raw text must use the existing `provider.extract_master_profile()` method.
+- The backend already has `api/profile.py` and `pdf_service.py` implemented. Do not duplicate logic, just extend `UserProfile` to save the raw text.
+- The `UserProfile` acts as a singleton.
+- The frontend profile page should display the currently saved profile if it exists.
 
 ## Out of Scope
 
 - Handling DOCX or other complex file formats.
-- Multiple separate user accounts (it is a personal, single-user system).
 
 ## Verification
 
-- Upload a real CV PDF via the frontend.
-- Verify the backend successfully extracts text and LLM generates a valid `MasterProfile` JSON.
+- Upload a real CV PDF via the frontend `/profile` page.
 - Submit a new Job Analysis.
 - Check the database/logs to confirm the LLM used the newly uploaded CV text instead of "Default Profile CV used."
 
 ## Completion Criteria
 
-- `UserProfile` database model is created.
-- PDF extraction works.
-- Frontend allows file selection and upload.
-- Job analysis dynamically uses the real CV text.
+- `UserProfile` correctly stores `raw_cv_text`.
+- Frontend `/profile` page allows file upload and displays the current profile.
+- Job analysis dynamically uses the real CV text from the DB.
 
 ## Agent Execution Prompt
 
