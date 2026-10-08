@@ -17,7 +17,7 @@ class Job(Base):
     prep_questions = Column(Text, nullable=True)  # Stored as JSON string
 
     # Relationships
-    feedbacks = relationship("InterviewFeedback", back_populates="job")
+    feedbacks = relationship("InterviewFeedback", back_populates="job", cascade="all, delete-orphan")
 
 class UserProfile(Base):
     __tablename__ = "user_profiles"
