@@ -68,3 +68,35 @@ CV:
             raise ValueError("Empty response from Gemini API.")
             
         return MasterProfile.model_validate_json(response.text)
+
+    def clean_raw_job_text(self, raw_text: str) -> str:
+        prompt = f"""
+You are an expert recruiter. The following text is scraped from a job board website.
+It contains a lot of noise (footers, similar jobs, cookie policies, company boilerplate, etc.).
+
+Your task is to extract ONLY the relevant information about the job itself:
+- Job Title and Location
+- Job Definition / Role Summary
+- Key Responsibilities
+- Requirements / Qualifications
+- Cultural Fit / Perks (if highly relevant)
+
+Do NOT include:
+- "Similar Jobs" or "People also viewed"
+- Website navigation menus, footers, or legal boilerplate
+- Irrelevant company marketing fluff
+
+Return the cleaned text formatted clearly. Do not use JSON, just return plain readable text.
+
+Raw Text:
+{raw_text}
+"""
+        response = self.client.models.generate_content(
+            model='gemini-3.8-flash',
+            contents=prompt,
+        )
+        
+        if not response.text:
+            return raw_text # Fallback to raw text if it fails
+            
+        return response.text
