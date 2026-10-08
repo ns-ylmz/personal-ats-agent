@@ -21,3 +21,8 @@ class LLMProvider(ABC):
     def extract_master_profile(self, cv_text: str) -> MasterProfile:
         """Extracts structured Master Profile (skills, experience) from a raw CV text."""
         pass
+        
+    @abstractmethod
+    def clean_raw_job_text(self, raw_text: str) -> str:
+        """Cleans raw scraped HTML text to extract only Job Definition, Requirements, and Cultural Fit."""
+        pass

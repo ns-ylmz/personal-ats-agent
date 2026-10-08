@@ -66,3 +66,35 @@ You must respond in strictly valid JSON format matching this schema:
             raise ValueError("Empty response from Ollama API.")
             
         return MasterProfile.model_validate_json(response['response'])
+
+    def clean_raw_job_text(self, raw_text: str) -> str:
+        prompt = f"""
+You are an expert recruiter. The following text is scraped from a job board website.
+It contains a lot of noise (footers, similar jobs, cookie policies, company boilerplate, etc.).
+
+Your task is to extract ONLY the relevant information about the job itself:
+- Job Title and Location
+- Job Definition / Role Summary
+- Key Responsibilities
+- Requirements / Qualifications
+- Cultural Fit / Perks (if highly relevant)
+
+Do NOT include:
+- "Similar Jobs" or "People also viewed"
+- Website navigation menus, footers, or legal boilerplate
+- Irrelevant company marketing fluff
+
+Return the cleaned text formatted clearly. Do not use JSON, just return plain readable text.
+
+Raw Text:
+{raw_text}
+"""
+        response = ollama.generate(
+            model=self.model,
+            prompt=prompt
+        )
+        
+        if not response or 'response' not in response:
+            return raw_text # Fallback
+            
+        return response['response']
