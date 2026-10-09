@@ -27,6 +27,7 @@ async def upload_master_profile(file: UploadFile = File(...), db: Session = Depe
             profile_record = models.UserProfile()
             db.add(profile_record)
         
+        profile_record.raw_cv_text = cv_text
         profile_record.skills = json.dumps(master_profile.skills)
         profile_record.experience_summary = master_profile.experience_summary
         

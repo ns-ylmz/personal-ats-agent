@@ -47,9 +47,18 @@ def worker_loop():
                         
                         job.job_description = job_desc_text # Persist the scraped text to DB
                     
+                    # Fetch UserProfile
+                    profile = db.query(models.UserProfile).first()
+                    if profile and profile.raw_cv_text:
+                        cv_context = profile.raw_cv_text
+                    elif profile:
+                        cv_context = f"Skills: {profile.skills}\nExperience: {profile.experience_summary}"
+                    else:
+                        cv_context = job.cv_text # Fallback to the requested text
+                        
                     # Process with LLM
                     provider = get_llm_provider()
-                    result = provider.analyze_job(job.cv_text, job_desc_text, past_feedback=past_feedback_text)
+                    result = provider.analyze_job(cv_context, job_desc_text, past_feedback=past_feedback_text)
                     
                     # Update job
                     job.match_score = result.match_score

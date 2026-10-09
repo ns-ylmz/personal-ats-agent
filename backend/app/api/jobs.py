@@ -33,7 +33,7 @@ async def sse_jobs_events():
 @router.post("/analyze", status_code=status.HTTP_202_ACCEPTED)
 async def analyze_job(request: schemas.JobAnalyzeRequest, db: Session = Depends(get_db)):
     new_job = models.Job(
-        cv_text=request.cv_text,
+        cv_text=request.cv_text or "",
         job_description=request.job_description,
         status="PENDING"
     )
