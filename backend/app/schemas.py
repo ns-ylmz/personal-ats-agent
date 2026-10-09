@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 class JobAnalyzeRequest(BaseModel):
-    cv_text: str
+    cv_text: Optional[str] = None
     job_description: str
 
 class JobStatusResponse(BaseModel):

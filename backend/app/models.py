@@ -23,6 +23,7 @@ class UserProfile(Base):
     __tablename__ = "user_profiles"
 
     id = Column(Integer, primary_key=True, index=True)
+    raw_cv_text = Column(Text, nullable=True) # Full text extracted from PDF
     skills = Column(Text, nullable=False)  # Stored as JSON string
     experience_summary = Column(Text, nullable=False)
 

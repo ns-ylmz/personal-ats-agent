@@ -72,7 +72,6 @@ export default function Dashboard() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          cv_text: "Default Profile CV used.", // Hardcoded until Profile context is wired
           job_description: url
         })
       });
@@ -117,19 +116,24 @@ export default function Dashboard() {
             </div>
           </div>
           
-          <form onSubmit={handleSubmit} className="flex w-full md:w-auto gap-2">
-            <Input 
-              placeholder="Paste LinkedIn/Glassdoor URL..." 
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              className="w-full md:w-80"
-              disabled={submitting}
-            />
-            <Button type="submit" disabled={submitting || !url}>
-              {submitting ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
-              Analyze
+          <div className="flex w-full md:w-auto gap-4 items-center">
+            <Button variant="outline" onClick={() => window.location.href = '/profile'}>
+              My Profile
             </Button>
-          </form>
+            <form onSubmit={handleSubmit} className="flex gap-2">
+              <Input 
+                placeholder="Paste LinkedIn/Glassdoor URL..." 
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                className="w-full md:w-80"
+                disabled={submitting}
+              />
+              <Button type="submit" disabled={submitting || !url}>
+                {submitting ? <Loader2 className="animate-spin w-4 h-4 mr-2" /> : <Plus className="w-4 h-4 mr-2" />}
+                Analyze
+              </Button>
+            </form>
+          </div>
         </div>
 
         {/* Kanban Board */}
