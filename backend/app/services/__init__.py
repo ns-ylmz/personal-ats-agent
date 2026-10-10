@@ -10,5 +10,8 @@ def get_llm_provider() -> LLMProvider:
     elif provider == "OLLAMA":
         from .ollama_provider import OllamaProvider
         return OllamaProvider()
+    elif provider == "OPENAI":
+        from .openai_provider import OpenAIProvider
+        return OpenAIProvider()
     else:
         raise ValueError(f"Unknown LLM_PROVIDER: {provider}")
