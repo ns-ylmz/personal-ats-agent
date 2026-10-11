@@ -1,17 +1,44 @@
+import logging
 import os
 from .llm_provider import LLMProvider
+from .fallback_provider import FallbackLLMProvider
+
+logger = logging.getLogger(__name__)
 
 def get_llm_provider() -> LLMProvider:
-    provider = os.getenv("LLM_PROVIDER", "GEMINI").upper()
-    
-    if provider == "GEMINI":
-        from .gemini_provider import GeminiProvider
-        return GeminiProvider()
-    elif provider == "OLLAMA":
-        from .ollama_provider import OllamaProvider
-        return OllamaProvider()
-    elif provider == "OPENAI":
-        from .openai_provider import OpenAIProvider
-        return OpenAIProvider()
-    else:
-        raise ValueError(f"Unknown LLM_PROVIDER: {provider}")
+    primary_name = os.getenv("LLM_PROVIDER", "GEMINI").upper()
+    enable_fallback = os.getenv("ENABLE_FALLBACK", "true").lower() in ("true", "1", "yes")
+
+    providers = []
+
+    # 1. Initialize primary provider
+    try:
+        if primary_name == "GEMINI":
+            from .gemini_provider import GeminiProvider
+            providers.append(GeminiProvider())
+        elif primary_name == "OPENAI":
+            from .openai_provider import OpenAIProvider
+            providers.append(OpenAIProvider())
+        elif primary_name == "OLLAMA":
+            from .ollama_provider import OllamaProvider
+            providers.append(OllamaProvider())
+        else:
+            logger.warning(f"Unknown primary LLM_PROVIDER: {primary_name}")
+    except Exception as e:
+        logger.warning(f"Could not initialize primary provider '{primary_name}': {e}")
+
+    # 2. Add fallback provider (Ollama) if enabled and primary is not already Ollama
+    if enable_fallback and primary_name != "OLLAMA":
+        try:
+            from .ollama_provider import OllamaProvider
+            providers.append(OllamaProvider())
+        except Exception as e:
+            logger.warning(f"Could not initialize fallback OllamaProvider: {e}")
+
+    if not providers:
+        raise RuntimeError("No LLM providers could be initialized. Please check your configuration.")
+
+    if len(providers) == 1:
+        return providers[0]
+
+    return FallbackLLMProvider(providers)
