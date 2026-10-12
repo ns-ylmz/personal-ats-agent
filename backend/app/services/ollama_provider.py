@@ -2,34 +2,24 @@ import os
 import json
 import ollama
 from .llm_provider import LLMProvider, JobAnalysisResult, MasterProfile
+from .prompts import (
+    get_analyze_job_prompt,
+    get_clean_raw_job_text_prompt,
+    get_extract_master_profile_prompt,
+)
 
 class OllamaProvider(LLMProvider):
     def __init__(self, model: str = "llama3"):
         self.model = os.getenv("OLLAMA_MODEL", model)
 
     def analyze_job(self, cv_text: str, job_description: str, past_feedback: str = "") -> JobAnalysisResult:
-        feedback_section = ""
-        if past_feedback:
-            feedback_section = f"""
-Past Interview Feedback Context:
-Focus on addressing these past interview weaknesses and areas of improvement when generating prep questions.
-{past_feedback}
-"""
-
-        prompt = f"""
-You are an expert ATS (Applicant Tracking System) and career coach.
-Analyze the following CV against the given job description.
-
-{feedback_section}
-
-CV:
-{cv_text}
-
-Job Description:
-{job_description}
-
-Please provide the match score, a cover letter, and prep questions.
-"""
+        prompt = get_analyze_job_prompt(
+            cv_text,
+            job_description,
+            past_feedback,
+            include_role_preamble=True,
+            include_suffix_instructions=True,
+        )
         response = ollama.generate(
             model=self.model,
             prompt=prompt,
@@ -42,14 +32,7 @@ Please provide the match score, a cover letter, and prep questions.
         return JobAnalysisResult.model_validate_json(response['response'])
 
     def extract_master_profile(self, cv_text: str) -> MasterProfile:
-        prompt = f"""
-Extract the core professional profile from the following CV.
-
-CV:
-{cv_text}
-
-Please provide the skills and experience summary.
-"""
+        prompt = get_extract_master_profile_prompt(cv_text, include_suffix_instructions=True)
         response = ollama.generate(
             model=self.model,
             prompt=prompt,
@@ -62,27 +45,7 @@ Please provide the skills and experience summary.
         return MasterProfile.model_validate_json(response['response'])
 
     def clean_raw_job_text(self, raw_text: str) -> str:
-        prompt = f"""
-You are an expert recruiter. The following text is scraped from a job board website.
-It contains a lot of noise (footers, similar jobs, cookie policies, company boilerplate, etc.).
-
-Your task is to extract ONLY the relevant information about the job itself:
-- Job Title and Location
-- Job Definition / Role Summary
-- Key Responsibilities
-- Requirements / Qualifications
-- Cultural Fit / Perks (if highly relevant)
-
-Do NOT include:
-- "Similar Jobs" or "People also viewed"
-- Website navigation menus, footers, or legal boilerplate
-- Irrelevant company marketing fluff
-
-Return the cleaned text formatted clearly. Do not use JSON, just return plain readable text.
-
-Raw Text:
-{raw_text}
-"""
+        prompt = get_clean_raw_job_text_prompt(raw_text)
         response = ollama.generate(
             model=self.model,
             prompt=prompt
