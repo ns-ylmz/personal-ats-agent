@@ -1,16 +1,21 @@
-import os
-from dotenv import load_dotenv
-load_dotenv()
-
 from contextlib import asynccontextmanager
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
-from app.database import engine
+from fastapi.middleware.cors import CORSMiddleware
+
 from app import models
-from app.worker import start_worker, job_queue
 from app.api import jobs, profile
+from app.database import engine
+from app.queue_manager import job_queue
+from app.worker import start_worker
+
+load_dotenv()
 
 # Create database tables
 models.Base.metadata.create_all(bind=engine)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -21,7 +26,6 @@ async def lifespan(app: FastAPI):
     job_queue.put(None)
     thread.join(timeout=5)
 
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Personal ATS Agent API", lifespan=lifespan)
 
@@ -35,7 +39,7 @@ app.add_middleware(
 app.include_router(jobs.router)
 app.include_router(profile.router)
 
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
-

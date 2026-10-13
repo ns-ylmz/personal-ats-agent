@@ -1,12 +1,14 @@
 import os
-import json
+
 import ollama
-from .llm_provider import LLMProvider, JobAnalysisResult, MasterProfile
+
+from .llm_provider import JobAnalysisResult, LLMProvider, MasterProfile
 from .prompts import (
     get_analyze_job_prompt,
     get_clean_raw_job_text_prompt,
     get_extract_master_profile_prompt,
 )
+
 
 class OllamaProvider(LLMProvider):
     def __init__(self, model: str = "llama3"):
@@ -23,35 +25,35 @@ class OllamaProvider(LLMProvider):
         response = ollama.generate(
             model=self.model,
             prompt=prompt,
-            format=JobAnalysisResult.model_json_schema()
+            format=JobAnalysisResult.model_json_schema(),
         )
-        
-        if not response or 'response' not in response:
+
+        if not response or "response" not in response:
             raise ValueError("Empty response from Ollama API.")
-            
-        return JobAnalysisResult.model_validate_json(response['response'])
+
+        return JobAnalysisResult.model_validate_json(response["response"])
 
     def extract_master_profile(self, cv_text: str) -> MasterProfile:
         prompt = get_extract_master_profile_prompt(cv_text, include_suffix_instructions=True)
         response = ollama.generate(
             model=self.model,
             prompt=prompt,
-            format=MasterProfile.model_json_schema()
+            format=MasterProfile.model_json_schema(),
         )
-        
-        if not response or 'response' not in response:
+
+        if not response or "response" not in response:
             raise ValueError("Empty response from Ollama API.")
-            
-        return MasterProfile.model_validate_json(response['response'])
+
+        return MasterProfile.model_validate_json(response["response"])
 
     def clean_raw_job_text(self, raw_text: str) -> str:
         prompt = get_clean_raw_job_text_prompt(raw_text)
         response = ollama.generate(
             model=self.model,
-            prompt=prompt
+            prompt=prompt,
         )
-        
-        if not response or 'response' not in response:
-            return raw_text # Fallback
-            
-        return response['response']
+
+        if not response or "response" not in response:
+            return raw_text  # Fallback
+
+        return response["response"]

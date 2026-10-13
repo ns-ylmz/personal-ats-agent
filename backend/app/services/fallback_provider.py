@@ -1,8 +1,10 @@
 import logging
 from typing import List
-from .llm_provider import LLMProvider, JobAnalysisResult, MasterProfile
+
+from .llm_provider import JobAnalysisResult, LLMProvider, MasterProfile
 
 logger = logging.getLogger(__name__)
+
 
 class FallbackLLMProvider(LLMProvider):
     def __init__(self, providers: List[LLMProvider]):
