@@ -1,7 +1,9 @@
-from playwright.sync_api import sync_playwright
 import logging
 
+from playwright.sync_api import sync_playwright
+
 logger = logging.getLogger(__name__)
+
 
 def scrape_job_description(url: str) -> str:
     """
@@ -18,7 +20,7 @@ def scrape_job_description(url: str) -> str:
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36"
             })
             page.goto(url, wait_until="domcontentloaded", timeout=30000)
-            
+
             # Basic attempt to get readable text
             text_content = page.evaluate("document.body.innerText")
             return text_content.strip()

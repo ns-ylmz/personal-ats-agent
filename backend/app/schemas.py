@@ -1,9 +1,12 @@
+from typing import List, Optional
+
 from pydantic import BaseModel
-from typing import Optional, List
+
 
 class JobAnalyzeRequest(BaseModel):
     cv_text: Optional[str] = None
     job_description: str
+
 
 class JobStatusResponse(BaseModel):
     id: int
@@ -16,11 +19,14 @@ class JobStatusResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
 class JobStatusUpdate(BaseModel):
     status: str
 
+
 class InterviewFeedbackCreate(BaseModel):
     feedback_text: str
+
 
 class InterviewFeedbackResponse(BaseModel):
     id: int
